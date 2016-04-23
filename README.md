@@ -1,13 +1,11 @@
-# Reinforcement learning workshop
-[Website](https://samjgrey3.github.io/reinforcejs-workshop/index.html)
+# Friendly DeepQ
+[Website](https://greydanus.github.io/friendly_deepq/index.html)
 
-Library taken from Karpathy's [reinforce.js](https://github.com/karpathy/reinforcejs). My goal here is to take the excellent library written by Karpathy and apply reinforcement to some interesting and creative situations.
+This is a project I designed in order to study how DeepQ networks learn to interact with other agents. The reinforcement learning JavaScript library and much of the world's physics taken from work by Andrej Karpathy.
 
-Also see the [main webpage](http://cs.stanford.edu/people/karpathy/reinforcejs) for Karpathy's excellent demos
+## Details
+This machine learning project is built purely in JavaScript. As such, it is not optimized for speed. Instead, it is meant to serve as a toy example with which you can easily test out ideas before implementing them more rigorously with a library like Theano, Torch, or Keras.
 
-# Update:
-I started building another completely unrelated project on this website, so it's sort of turning into a general workspace for my javascript projects. Thes new project is pretty cool - pretty much, it's about adding dynamics to fractals to eventually simulate chaotic systems such as trees blowing in the wind.
-
-# License
+## License
 
 MIT.
