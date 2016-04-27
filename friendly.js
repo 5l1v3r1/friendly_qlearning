@@ -75,7 +75,7 @@ var util_add_box = function(lst, x, y, w, h) {
 // item is circle thing on the floor that agent can interact with (see or eat, etc)
 var Item = function(x, y, type) {
   this.p = new Vec(x, y); // position
-  this.v = new Vec(Math.random()*5-2.5, Math.random()*5-2.5);
+  this.v = new Vec(Math.random()-.5, Math.random()-.5);
   this.type = type;
   this.rad = 10; // default radius
   this.age = 0;
@@ -101,12 +101,15 @@ var World = function() {
   */
   
   // set up food and poison
+  this.poison_speed = 4;
+  this.nitems = 100
   this.items = []
-  for(var k=0;k<10;k++) {
-    var x = randf(20, this.W-20);
-    var y = randf(20, this.H-20);
-    var t = 2//randi(2, 3); // food or poison (1 and 2)
+  for(var k=0;k<this.nitems;k++) {
+    var x = randf(20, this.W-10);
+    var y = randf(20, this.H-10);
+    var t = randi(3, 5); // apples or poison (3 and 4)
     var it = new Item(x, y, t);
+    it.v.scale(this.poison_speed);
     this.items.push(it);
   }
 }
@@ -274,12 +277,12 @@ World.prototype = {
           var rescheck = false;
           if(!rescheck) { 
             // ding! nom nom nom
-            if(it.type === 1) {
-              a.digestion_signal += 1.0; // mmm delicious apple
+            if(it.type === 3) {
+              a.digestion_signal += 1.0 * (a.type*2 - 3); // mmm delicious apple (if type is 1) -> else it's POISON!!!
               a.apples++;
             }
-            if(it.type === 2) {
-              a.digestion_signal += -1.0; // ewww poison
+            if(it.type === 4) {
+              a.digestion_signal += -1.0 * (a.type*2 - 3); // ewww poison (if type is 1) -> else it's mmm apple!!!
               a.poison++;
             }
             it.cleanup_ = true;
@@ -296,11 +299,11 @@ World.prototype = {
       }
       // document.getElementById("demo").innerHTML = "this is just a test";
       // make poison hunt the agents
-      if(it.type === 2) {
-        // document.getElementById("demo").innerHTML = nearest_agent.x.toString();
-        it.v.x = nearest_agent.x / nearest_agent.length() * 4;
-        it.v.y = nearest_agent.y / nearest_agent.length() * 4;
-      }
+      // if(it.type === 2) {
+      //   // document.getElementById("demo").innerHTML = nearest_agent.x.toString();
+      //   it.v.x = nearest_agent.x / nearest_agent.length() * this.poison_speed;
+      //   it.v.y = nearest_agent.y / nearest_agent.length() * this.poison_speed;
+      // }
         
       // move the items
       it.p.x += it.v.x;
@@ -324,12 +327,16 @@ World.prototype = {
       }
       this.items = nt; // swap
     }
-    if(this.items.length < 10 && this.clock % 10 === 0 && randf(0,1)<0.25) {
-      var newitx = randf(20, this.W-20);
-      var newity = randf(20, this.H-20);
-      var newitt = 2 //randi(1, 3); // food or poison (1 and 2)
-      var newit = new Item(newitx, newity, newitt);
-      this.items.push(newit);
+    if(this.items.length < this.nitems && this.clock % 10 === 0 && randf(0,1)<0.25) {
+      var items_to_replace = Math.floor((this.nitems - this.items.length)/3);
+      for(var k=0;k<items_to_replace;k++) {
+        var x = randf(20, this.W-20);
+        var y = randf(20, this.H-20);
+        var t = randi(3, 5); // apples or poison (3 and 4)
+        var it = new Item(x, y, t);
+        it.v.scale(this.poison_speed);
+        this.items.push(it);
+      }
     }
     
     // agents are given the opportunity to learn based on feedback of their action on environment
@@ -369,6 +376,7 @@ var Agent = function() {
   this.rad = 10;
   this.eyes = [];
   for(var k=0;k<30;k++) { this.eyes.push(new Eye(k*0.21)); }
+  this.type = randi(1,3);  // poison lover or apple lover (1 or 2)
   
   this.brain = null; // set from outside
 
@@ -405,7 +413,7 @@ Agent.prototype = {
       input_array[i*5+3] = e.vx; // velocity information of the sensed target
       input_array[i*5+4] = e.vy;
       if(e.sensed_type !== -1) {
-        // sensed_type is 0 for wall, 1 for other agents, and 2 for poison.
+        // sensed_type is 0 for wall, 1 for poison lover, and 2 for apple lover, 3 for apples, and 4 for poison.
         // lets do a 1-of-k encoding into the input array
         input_array[i*5 + e.sensed_type] = e.sensed_proximity/e.max_range; // normalize to [0,1]
       }
@@ -422,18 +430,18 @@ Agent.prototype = {
   backward: function() {
     var reward = this.digestion_signal;
 
-    // var proximity_reward = 0.0;
-    // var num_eyes = this.eyes.length;
-    // for(var i=0;i<num_eyes;i++) {
-    //   var e = this.eyes[i];
-    //   // agents dont like to see walls, especially up close
-    //   proximity_reward += e.sensed_type === 0 ? e.sensed_proximity/e.max_range : 1.0;
-    // }
-    // proximity_reward = proximity_reward/num_eyes;
-    // reward += proximity_reward;
+    var proximity_reward = -.2;
+    var num_eyes = this.eyes.length;
+    for(var i=0;i<num_eyes;i++) {
+      var e = this.eyes[i];
+      // agents dont like to see walls, especially up close
+      proximity_reward += e.sensed_type === 0 ? e.sensed_proximity/e.max_range : 1.0;
+    }
+    proximity_reward = proximity_reward/num_eyes;
+    reward += proximity_reward;
 
-    //var forward_reward = 0.0;
-    //if(this.actionix === 0) forward_reward = 1;
+    var forward_reward = 0.0;
+    if(this.actionix === 0) forward_reward = 1;
 
     this.last_reward = reward; // for vis
     this.brain.learn(reward);
