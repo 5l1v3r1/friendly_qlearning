@@ -101,8 +101,8 @@ var World = function() {
   */
   
   // set up food and poison
-  this.item_speed = 2;
-  this.nitems = 130;
+  this.item_speed = 1;
+  this.nitems = 700;
   this.items = [];
   for(var k=0;k<this.nitems;k++) {
     var x = randf(20, this.W-10);
@@ -279,10 +279,10 @@ World.prototype = {
             // ding! nom nom nom
             if(it.type === 3) {
               if (a.type===1) {a.digestion_signal += 1.0; a.apples++;} // mmm delicious apple (if type is 1)
-              else if (a.type===2) {a.digestion_signal += -3.0; a.apples++;} // sorry you can't eat apples
+              else if (a.type===2) {a.digestion_signal += -4.0; a.apples++;} // sorry you can't eat apples
             }
             if(it.type === 4) {
-              if (a.type===1) {a.digestion_signal += -3.0; a.poison++;} // ewww poison (if type is 1)
+              if (a.type===1) {a.digestion_signal += -4.0; a.poison++;} // ewww poison (if type is 1)
               else if (a.type===2) {a.digestion_signal += 1.0; a.poison++;} // nice, you're safe
             }
             it.cleanup_ = true;
@@ -328,7 +328,7 @@ World.prototype = {
       this.items = nt; // swap
     }
     if(this.items.length < this.nitems && this.clock % 10 === 0 && randf(0,1)<0.25) {
-      var items_to_replace = 2; //Math.floor((this.nitems - this.items.length)/7);
+      var items_to_replace = 5; //Math.floor((this.nitems - this.items.length)/7);
       for(var k=0;k<items_to_replace;k++) {
         var x = randf(20, this.W-20);
         var y = randf(20, this.H-20);
@@ -430,7 +430,7 @@ Agent.prototype = {
   backward: function() {
     var reward = this.digestion_signal;
 
-    var proximity_reward = -.1;
+    var proximity_reward = -.3;
     var num_eyes = this.eyes.length;
     for(var i=0;i<num_eyes;i++) {
       var e = this.eyes[i];
