@@ -413,7 +413,7 @@ Agent.prototype = {
       input_array[i*5+3] = e.vx; // velocity information of the sensed target
       input_array[i*5+4] = e.vy;
       if(e.sensed_type !== -1) {
-        // sensed_type is 0 for wall, 1 for poison lover, and 2 for apple lover, 3 for apples, and 4 for poison.
+        // sensed_type is 0 for wall, 1 for apple lover, and 2 for poison lover, 3 for apples, and 4 for poison.
         // lets do a 1-of-k encoding into the input array
         input_array[i*5 + e.sensed_type] = e.sensed_proximity/e.max_range; // normalize to [0,1]
       }
