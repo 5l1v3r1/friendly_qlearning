@@ -101,7 +101,7 @@ var World = function() {
   */
   
   // set up food and poison
-  this.poison_speed = 4;
+  this.item_speed = 2;
   this.nitems = 130;
   this.items = [];
   for(var k=0;k<this.nitems;k++) {
@@ -109,7 +109,7 @@ var World = function() {
     var y = randf(20, this.H-10);
     var t = randi(3, 5); // apples or poison (3 and 4)
     var it = new Item(x, y, t);
-    it.v.scale(this.poison_speed);
+    it.v.scale(this.item_speed);
     this.items.push(it);
   }
 }
@@ -301,8 +301,8 @@ World.prototype = {
       // make poison hunt the agents
       // if(it.type === 2) {
       //   // document.getElementById("demo").innerHTML = nearest_agent.x.toString();
-      //   it.v.x = nearest_agent.x / nearest_agent.length() * this.poison_speed;
-      //   it.v.y = nearest_agent.y / nearest_agent.length() * this.poison_speed;
+      //   it.v.x = nearest_agent.x / nearest_agent.length() * this.item_speed;
+      //   it.v.y = nearest_agent.y / nearest_agent.length() * this.item_speed;
       // }
         
       // move the items
@@ -334,7 +334,7 @@ World.prototype = {
         var y = randf(20, this.H-20);
         var t = randi(3, 5); // apples or poison (3 and 4)
         var it = new Item(x, y, t);
-        it.v.scale(this.poison_speed);
+        it.v.scale(this.item_speed);
         this.items.push(it);
       }
     }
