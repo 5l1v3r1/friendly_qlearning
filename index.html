@@ -137,7 +137,7 @@
     function tick() {
 
       if(simspeed === 3) {
-        for(var k=0;k<100;k++) {
+        for(var k=0;k<200;k++) {
           w.tick();
         }
       } else {
@@ -253,35 +253,52 @@
       skipdraw = false;
       simspeed = 0;
     }
-
+    
     function saveAgent() {
-      var brain = w.agents[0].brain;
+      var json = {};
+      for(var b=0,nb=w.agents.length;b<nb;b++) {
+        var agent_i = {};
+        agent_i['brain_' + b] = w.agents[b].brain.toJSON();
+        agent_i['type_' + b] = w.agents[b].type;
+
+        json['agent_' + b] = agent_i;
+      }
       $("#mysterybox").fadeIn();
-      $("#mysterybox").val(JSON.stringify(brain.toJSON()));
+      $("#mysterybox").val(JSON.stringify(json));
     }
     
     function resetAgent() {
       eval($("#agentspec").val())
-      var brain = new RL.DQNAgent(env, spec);
-      w.agents[0].brain = brain;
+      w.agents = [];
+      for(var k = 0; k < 2; k++) {
+        var a = new Agent();
+        a.brain = new RL.DQNAgent(env, spec); // give agent a TD brain
+        w.agents.push(a);
+      }
     }
 
-    function loadAgent() {
+    function loadAgents() {
       $.getJSON( "agentzoo/binary_agents.json", function( data ) {
-        var agent = w.agents[0].brain;
-        agent.fromJSON(data[0]); // cross your fingers...
-        // set epsilon to be much lower for more optimal behavior
-        agent.epsilon = 0.05;
 
-        var agent2 = w.agents[0].brain;
-        agent2.fromJSON(data[1]); // cross your fingers...
-        // set epsilon to be much lower for more optimal behavior
-        agent2.epsilon = 0.05;
+        console.log(data);
 
-        $("#slider").slider('value', agent.epsilon);
-        $("#eps").html(agent.epsilon.toFixed(2));
+        var agent0 = w.agents[0].brain;
+        agent0.fromJSON(data.agent_0.brain_0); // cross your fingers...
+        w.agents[0].type = data.agent_0.type_0;
+        // set epsilon to be much lower for more optimal behavior
+        agent0.epsilon = 0.05;
+
+        //same for second agent
+        var agent1 = w.agents[1].brain;
+        agent1.fromJSON(data.agent_1.brain_1); // cross your fingers...
+        w.agents[1].type = data.agent_1.type_1;
+        agent1.epsilon = 0.05;
+
+        $("#slider").slider('value', agent0.epsilon);
+        $("#eps").html(agent0.epsilon.toFixed(2));
         // kill learning rate to not learn
-        agent.alpha = 0;
+        agent0.alpha = 0.005;
+        agent1.alpha = 0.005;
       });
     }
 
@@ -392,7 +409,7 @@
       for(var i=0; i<w.agents.length; i++) {
         var a = w.agents[i];
         var loves = "apples";
-        if (a.type === 1) {
+        if (a.type === 2) {
           loves = "poison";
         }
         stats += "Player " + (i+1) + ": " + a.apples + " apples, " + a.poison + " poison (loves " + loves + ")<br>";
@@ -435,16 +452,17 @@
 <div class="maintext" style="text-align:center">
 
   <div style="text-align:center;">
-  <button class="btn btn-danger" onclick="resetAgent()" style="width:150px;height:50px;margin-bottom:5px;">Reinit agent</button>
-  <button class="btn btn-success" onclick="goveryfast()" style="width:150px;height:50px;margin-bottom:5px;">Go very fast</button>
-  <button class="btn btn-success" onclick="gofast()" style="width:150px;height:50px;margin-bottom:5px;">Go fast</button>
-  <button class="btn btn-success" onclick="gonormal()" style="width:150px;height:50px;margin-bottom:5px;">Go normal</button>
-  <button class="btn btn-success" onclick="goslow()" style="width:150px;height:50px;margin-bottom:5px;">Go slow</button>
+  <button class="btn btn-danger" onclick="resetAgent()" style="width:150px;height:30px;margin-bottom:5px;">Reinit agent</button>
+  <button class="btn btn-success" onclick="goveryfast()" style="width:150px;height:30px;margin-bottom:5px;">Go very fast</button>
+  <button class="btn btn-success" onclick="gofast()" style="width:150px;height:30px;margin-bottom:5px;">Go fast</button>
+  <button class="btn btn-success" onclick="gonormal()" style="width:150px;height:30px;margin-bottom:5px;">Go normal</button>
+  <button class="btn btn-success" onclick="goslow()" style="width:150px;height:30px;margin-bottom:5px;">Go slow</button>
   <br>
-  <button class="btn btn-danger" onclick="toggleAgentView()" style="width:250px;height:50px;margin-bottom:5px;">Toggle Agent View</button>
-  <button class="btn btn-danger" onclick="enableHuman()" style="width:250px;height:50px;margin-bottom:5px;">Start playing (use arrow keys)</button>
+  <button class="btn btn-danger" onclick="toggleAgentView()" style="width:250px;height:30px;margin-bottom:5px;">Toggle Agent View</button>
+  <button class="btn btn-danger" onclick="enableHuman()" style="width:250px;height:30px;margin-bottom:5px;">Start playing (use arrow keys)</button>
   <br>
-  <button class="btn btn-primary" onclick="loadAgent()" style="width:200px;height:35px;margin-bottom:5px;margin-right:20px;">Load Pretrained Agent</button>
+  <button class="btn btn-primary" onclick="loadAgents()" style="width:200px;height:30px;margin-bottom:5px;margin-right:20px;">Load Pretrained Agents</button>
+  <button class="btn btn-primary" onclick="saveAgent()" style="width:200px;height:30px;margin-bottom:5px;margin-right:20px;">Save Agents</button>
   <br>
   <br>
   Exploration epsilon: <span id="eps">0.15</span> <div id="slider"></div>
