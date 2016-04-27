@@ -88,7 +88,7 @@
           var e = a.eyes[ei];
           var sr = e.sensed_proximity;
           if(e.sensed_type === -1) { ctx.strokeStyle = "rgb(200,200,200)"; } // nothing
-          if(e.sensed_type === 0) { ctx.strokeStyle = "rgb(50,50,50)"; } // wall
+          if(e.sensed_type === 0) { ctx.strokeStyle = "rgb(100,100,100)"; } // wall
           if(e.sensed_type === 1) { ctx.strokeStyle = "rgb(150,150,200)"; } // poison lover
           if(e.sensed_type === 2) { ctx.strokeStyle = "rgb(150,150,255)"; } // apple lover
           if(e.sensed_type === 3) { ctx.strokeStyle = "rgb(255,150,150)"; } // apples
@@ -102,8 +102,8 @@
 
         // set agent body color
         reward_color = a.last_reward*100;
-        if(a.type === 1) { ctx.fillStyle = "rgb(100,0,0)"; } // likes apples
-        if(a.type === 2) { ctx.fillStyle = "rgb(0,100,0)"; } // likes poison
+        if(a.type === 1) { ctx.fillStyle = "rgb(150,0,0)"; } // likes apples
+        if(a.type === 2) { ctx.fillStyle = "rgb(0,150,0)"; } // likes poison
         ctx.strokeStyle = "rgb(200,200,200)";
         ctx.lineWidth=1;
         
