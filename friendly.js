@@ -102,7 +102,7 @@ var World = function() {
   
   // set up food and poison
   this.poison_speed = 4;
-  this.nitems = 100;
+  this.nitems = 130;
   this.items = [];
   for(var k=0;k<this.nitems;k++) {
     var x = randf(20, this.W-10);
