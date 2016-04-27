@@ -76,33 +76,42 @@
       ctx.stroke();
 
       // draw agents
-      // color agent based on reward it is experiencing at the moment
-      var r = 0;
-      ctx.fillStyle = "rgb(" + r + ", 150, 150)";
+      // color agent based on reward it is experiencing at the moment // and type of agent
+      var reward_color = 0;
+      var atype_color = 0;
       ctx.strokeStyle = "rgb(0,0,0)";
       for(var i=0,n=agents.length;i<n;i++) {
         var a = agents[i];
+        
+        // draw agents sight
+        for(var ei=0,ne=a.eyes.length;ei<ne;ei++) {
+          var e = a.eyes[ei];
+          var sr = e.sensed_proximity;
+          if(e.sensed_type === -1) { ctx.strokeStyle = "rgb(200,200,200)"; } // nothing
+          if(e.sensed_type === 0) { ctx.strokeStyle = "rgb(50,50,50)"; } // wall
+          if(e.sensed_type === 1) { ctx.strokeStyle = "rgb(150,150,200)"; } // poison lover
+          if(e.sensed_type === 2) { ctx.strokeStyle = "rgb(150,150,255)"; } // apple lover
+          if(e.sensed_type === 3) { ctx.strokeStyle = "rgb(255,150,150)"; } // apples
+          if(e.sensed_type === 4) { ctx.strokeStyle = "rgb(150,255,150)"; } // poison
+          ctx.lineWidth=2;
+          ctx.beginPath();
+          ctx.moveTo(a.op.x, a.op.y);
+          ctx.lineTo(a.op.x + sr * Math.sin(a.oangle + e.angle),
+                     a.op.y + sr * Math.cos(a.oangle + e.angle));
+          ctx.stroke();
+
+        // set agent body color
+        reward_color = a.last_reward*100;
+        atype_color = (a.type - 1)*200 + 50;
+        ctx.fillStyle = "rgb(0, 0, " + atype_color + ")";
+        ctx.lineWidth=1;
         
         // draw agents body
         ctx.beginPath();
         ctx.arc(a.op.x, a.op.y, a.rad, 0, Math.PI*2, true);
         ctx.fill();
         ctx.stroke();
-        
-        // draw agents sight
-        for(var ei=0,ne=a.eyes.length;ei<ne;ei++) {
-          var e = a.eyes[ei];
-          var sr = e.sensed_proximity;
-          if(e.sensed_type === -1 || e.sensed_type === 0) {
-            ctx.strokeStyle = "rgb(200,200,200)"; // wall or nothing
-          }
-          if(e.sensed_type === 1) { ctx.strokeStyle = "rgb(255,150,150)"; } // apples
-          if(e.sensed_type === 2) { ctx.strokeStyle = "rgb(150,255,150)"; } // poison
-          ctx.beginPath();
-          ctx.moveTo(a.op.x, a.op.y);
-          ctx.lineTo(a.op.x + sr * Math.sin(a.oangle + e.angle),
-                     a.op.y + sr * Math.cos(a.oangle + e.angle));
-          ctx.stroke();
+
         }
       }
       
@@ -111,8 +120,8 @@
       if(!agentView) {
         for(var i=0,n=w.items.length;i<n;i++) {
           var it = w.items[i];
-          if(it.type === 1) ctx.fillStyle = "rgb(255, 150, 150)";
-          if(it.type === 2) ctx.fillStyle = "rgb(150, 255, 150)";
+          if(it.type === 3) ctx.fillStyle = "rgb(255, 150, 150)"; //apple
+          if(it.type === 4) ctx.fillStyle = "rgb(150, 255, 150)"; //poison
           ctx.beginPath();
           ctx.arc(it.p.x, it.p.y, it.rad, 0, Math.PI*2, true);
           ctx.fill();
@@ -128,7 +137,7 @@
     function tick() {
 
       if(simspeed === 3) {
-        for(var k=0;k<50;k++) {
+        for(var k=0;k<100;k++) {
           w.tick();
         }
       } else {
@@ -328,11 +337,11 @@
       w = new World();
       var a = new Agent();
       env = a;
-      hive_mind = new RL.DQNAgent(env, spec);
+      // hive_mind = new RL.DQNAgent(env, spec);
       w.agents = [];
-      for(var k = 0; k < 10; k++) {
+      for(var k = 0; k < 2; k++) {
         var a = new Agent();
-        a.brain = hive_mind; // give agent a TD brain
+        a.brain = new RL.DQNAgent(env, spec); // give agent a TD brain
         //a.brain = new RL.RecurrentReinforceAgent(env, {});
         w.agents.push(a);
         smooth_reward_history.push([]);
@@ -376,7 +385,12 @@
     function updateStats() {
       var stats = "<p>";
       for(var i=0; i<w.agents.length; i++) {
-        stats += "Player " + (i+1) + ": " + w.agents[i].apples + " apples, " + w.agents[i].poison + " poison<br>";
+        var a = w.agents[i];
+        var loves = "apples";
+        if (a.type === 1) {
+          loves = "poison";
+        }
+        stats += "Player " + (i+1) + ": " + a.apples + " apples, " + a.poison + " poison (loves " + loves + ")<br>";
       }
       stats += "</p>";
       $("#apples_and_poison").html(stats);
