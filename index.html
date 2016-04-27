@@ -267,12 +267,17 @@
     }
 
     function loadAgent() {
-      document.getElementById("demo").innerHTML = "Loaded an agent from the zoo";
-      $.getJSON( "agentzoo/herdagent.json", function( data ) {
+      $.getJSON( "agentzoo/binary_agents.json", function( data ) {
         var agent = w.agents[0].brain;
-        agent.fromJSON(data); // corss your fingers...
+        agent.fromJSON(data[0]); // cross your fingers...
         // set epsilon to be much lower for more optimal behavior
         agent.epsilon = 0.05;
+
+        var agent2 = w.agents[0].brain;
+        agent2.fromJSON(data[1]); // cross your fingers...
+        // set epsilon to be much lower for more optimal behavior
+        agent2.epsilon = 0.05;
+
         $("#slider").slider('value', agent.epsilon);
         $("#eps").html(agent.epsilon.toFixed(2));
         // kill learning rate to not learn
