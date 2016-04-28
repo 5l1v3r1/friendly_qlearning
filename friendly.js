@@ -102,7 +102,7 @@ var World = function() {
   
   // set up food and poison
   this.item_speed = 1;
-  this.nitems = 700;
+  this.nitems = 250;
   this.items = [];
   for(var k=0;k<this.nitems;k++) {
     var x = randf(20, this.W-10);
@@ -328,7 +328,7 @@ World.prototype = {
       this.items = nt; // swap
     }
     if(this.items.length < this.nitems && this.clock % 10 === 0 && randf(0,1)<0.25) {
-      var items_to_replace = 25; //Math.floor((this.nitems - this.items.length)/7);
+      var items_to_replace = 4; //Math.floor((this.nitems - this.items.length)/7);
       for(var k=0;k<items_to_replace;k++) {
         var x = randf(20, this.W-20);
         var y = randf(20, this.H-20);
