@@ -1,5 +1,5 @@
-# Friendly qLearner
-[Website](https://greydanus.github.io/friendly_deepq/index.html)
+# Friendly qLearning
+[Website](https://greydanus.github.io/friendly_qlearning/index.html)
 
 This is a project I designed in order to study how qlearning networks learn to interact with each other. The reinforcement learning JavaScript library and much of the world's physics taken from work by Andrej Karpathy.
 
