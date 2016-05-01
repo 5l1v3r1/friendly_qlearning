@@ -20,8 +20,9 @@
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-72311215-4', 'auto');
+    ga('create', 'UA-72311215-5', 'auto');
     ga('send', 'pageview');
+
   </script>
   
   <!-- bootstrap -->
@@ -93,6 +94,7 @@
           if(e.sensed_type === 2) { ctx.strokeStyle = "rgb(150,150,255)"; } // apple lover
           if(e.sensed_type === 3) { ctx.strokeStyle = "rgb(255,150,150)"; } // apples
           if(e.sensed_type === 4) { ctx.strokeStyle = "rgb(150,255,150)"; } // poison
+          if(e.sensed_type === 5) { ctx.strokeStyle = "rgb(220,220,220)"; } // poison
           ctx.lineWidth=2;
           ctx.beginPath();
           ctx.moveTo(a.op.x, a.op.y);
@@ -123,6 +125,7 @@
           var it = w.items[i];
           if(it.type === 3) ctx.fillStyle = "rgb(255, 150, 150)"; //apple
           if(it.type === 4) ctx.fillStyle = "rgb(150, 255, 150)"; //poison
+          if(it.type === 5) ctx.fillStyle = "rgb(220, 220, 220)"; //flipme
           ctx.beginPath();
           ctx.arc(it.p.x, it.p.y, it.rad, 0, Math.PI*2, true);
           ctx.fill();
@@ -205,8 +208,8 @@
           max: nflot
         },
         yaxis: {
-          min: -1.0,
-          max: 1.0
+          min: -0.10,
+          max: 0.10
         }
       });
       setInterval(function(){
@@ -279,7 +282,7 @@
     }
 
     function loadAgents() {
-      $.getJSON( "agentzoo/regular_3hr.json", function( data ) {
+      $.getJSON( "agentzoo/flipme.json", function( data ) {
 
         console.log(data);
 
@@ -298,54 +301,13 @@
         $("#slider").slider('value', agent0.epsilon);
         $("#eps").html(agent0.epsilon.toFixed(2));
         // kill learning rate to not learn
-        agent0.alpha = 0.005;
-        agent1.alpha = 0.005;
+        agent0.alpha = 0.000;
+        agent1.alpha = 0.000;
       });
     }
 
     function toggleAgentView() {
       agentView = !agentView;
-    }
-
-    var lastKey = null;
-    document.onkeydown = function(e) {
-      var event = window.event ? window.event : e;
-      lastKey = event.keyCode
-      if(lastKey == 37 || lastKey == 38 || lastKey == 39 || lastKey == 40) {
-        enableHuman();
-        e.preventDefault();
-        if(lastKey == 37) {
-          humanAction = 0;
-        }
-        if(lastKey == 39) {
-          humanAction = 1;
-        }
-        if(lastKey == 38) {
-          humanAction = 2;
-        }
-        if(lastKey == 40) {
-          humanAction = 3;
-        }
-      }
-    };
-
-    var humanAction = -1;
-    function enableHuman() {
-      if(!humanControls) {
-        humanControls = true;
-        var a = new Agent();
-        a.forward = function() {
-          this.action = humanAction;
-          humanAction = -1;
-        };
-        a.brain = {
-          learn: function(reward) {
-           // Do nothing;
-          }
-        };
-        w.agents.push(a);
-        smooth_reward_history.push([]);
-      }
     }
 
     var w; // global world object
@@ -370,18 +332,49 @@
         smooth_reward_history.push([]);
       }
 
-      $( "#slider" ).slider({
+      // epsilon slider
+      $( "#eps_slider" ).slider({
         min: 0,
         max: 1,
         value: w.agents[0].brain.epsilon,
         step: 0.01,
         slide: function(event, ui) {
-          w.agents[0].brain.epsilon = ui.value;
+          w.agents[0].brain.epsilon = ui.value.toFixed(2);
+          w.agents[1].brain.epsilon = ui.value.toFixed(2);
           $("#eps").html(ui.value.toFixed(2));
         }
       });
-      $("#eps").html(w.agents[0].brain.epsilon.toFixed(2));
-      $("#slider").slider('value', w.agents[0].brain.epsilon);
+      $("#eps").html(w.agents[0].brain.epsilon);
+      $("#eps_slider").slider('value', w.agents[0].brain.epsilon);
+
+      // item density slider
+      $( "#density_slider" ).slider({
+        min:   0,
+        max:   500,
+        value: 300,
+        step:  1,
+        slide: function(event, ui) {
+          w.nitems = ui.value;
+          $("#density").html(ui.value);
+        }
+      });
+      $("#density").html(w.nitems);
+      $("#density_slider").slider('value', w.nitems);
+
+      // alpha slider
+      $( "#alpha_slider" ).slider({
+        min:   0,
+        max:   .05,
+        value: .005,
+        step:  .0001,
+        slide: function(event, ui) {
+          w.agents[0].brain.alpha = ui.value.toFixed(4);
+          w.agents[1].brain.alpha = ui.value.toFixed(4);
+          $("#alpha").html(ui.value.toFixed(4));
+        }
+      });
+      $("#alpha").html(w.agents[0].brain.alpha);
+      $("#alpha_slider").slider('value', w.agents[0].brain.alpha);
       
       initFlot();
       gonormal();
@@ -434,7 +427,7 @@
     
 
 <div id="header">
-  <h1><b>Friendly DeepQ</b>: Exploring social behavior with DeepQ agents</h1>
+  <h1><b>FlipMe</b>: Exploring social behavior with DeepQ agents</h1>
   <div style="clear:both;"></div>
 </div>
 
@@ -443,7 +436,7 @@
     <h2>Summary</h2>
 
     <div id="coursedesc">
-    This is a project I designed in order to study how DeepQ networks learn to interact with other agents. JavaScript library and much of the world's physics taken from work by Andrej Karpathy. 
+    This is a project I designed in order to study how DeepQ networks learn to interact with other agents. JavaScript reinforcement learning library and much of the world's physics taken from a <a href="https://cs.stanford.edu/people/karpathy/reinforcejs/">project</a> by Andrej Karpathy. 
     </div>
   </div>
 </div>
@@ -459,14 +452,13 @@
   <button class="btn btn-success" onclick="gonormal()" style="width:150px;height:30px;margin-bottom:5px;">Go normal</button>
   <button class="btn btn-success" onclick="goslow()" style="width:150px;height:30px;margin-bottom:5px;">Go slow</button>
   <br>
-  <button class="btn btn-danger" onclick="toggleAgentView()" style="width:250px;height:30px;margin-bottom:5px;">Toggle Agent View</button>
-  <button class="btn btn-danger" onclick="enableHuman()" style="width:250px;height:30px;margin-bottom:5px;">Start playing (use arrow keys)</button>
-  <br>
   <button class="btn btn-primary" onclick="loadAgents()" style="width:200px;height:30px;margin-bottom:5px;margin-right:20px;">Load Pretrained Agents</button>
   <button class="btn btn-primary" onclick="saveAgent()" style="width:200px;height:30px;margin-bottom:5px;margin-right:20px;">Save Agents</button>
   <br>
   <br>
-  Exploration epsilon: <span id="eps">0.15</span> <div id="slider"></div>
+  Exploration epsilon: <span id="eps">0.20</span> <div style="width:70%;margin-left:auto;margin-right:auto" id="eps_slider"></div>
+  Item density: <span id="density">300</span> <div style="width:70%;margin-left:auto;margin-right:auto" id="density_slider"></div>
+  Learning rate alpha: <span id="alpha">0.005</span> <div style="width:70%;margin-left:auto;margin-right:auto" id="alpha_slider"></div>
   <br>
 
   <canvas id="canvas" width="700" height="500"></canvas>
@@ -503,12 +495,12 @@
 
 
 <div class="maintext">
-    <h3> DeepQ Reinforcement Learning</h3>
+    <h3> DeepQ Social Learning</h3>
     <p>
-        This is my first attempt at simulating a state space with multiple DeepQ agents. The optimal strategy for the agents will be to cooperate with each other, giving us social interactions which are very interesting from a theoretical perspective. I plan to take this project beyond the JavaScript stage in coming months.
+        The items in this world begin as 'flipme' items. The agents come in two types: apple-loving and poison-loving. Once an agent touches one of these items, the item becomes the opposite of what the agent likes. My hope is that two different agents will learn an optimal strategy of 'hanging out' together so that they can flip items for each other's mutual benefit. Yay cooperation!
     </p>
     <p>
-        <b>Note</b>. The world and its rewards still need tuning. I doubt that the optimal strategy is currently a form of cooperation. I'm working on it!
+        <b>Note</b>. To test whether or not cooperation is happening, click 'Load Pretrained Agent' (or train your own), reduce the epsilon and alpha parameters to 0, and reduce the number of items to 0 or only a small number (such as 10 or 20). You should see a clear cooperative strategy (though exactly how they cooperate is surprising).
     </p>
 </div>
 
