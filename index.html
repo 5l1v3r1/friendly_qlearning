@@ -20,7 +20,7 @@
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-72311215-4', 'auto');
+    ga('create', 'UA-72311215-5', 'auto');
     ga('send', 'pageview');
 
   </script>
@@ -290,23 +290,22 @@
         agent0.fromJSON(data.agent_0.brain_0); // cross your fingers...
         w.agents[0].type = data.agent_0.type_0;
         // set epsilon to be much lower for more optimal behavior
-        agent0.epsilon = 0.05;
+        agent0.epsilon = 0.20;
 
         //same for second agent
         var agent1 = w.agents[1].brain;
         agent1.fromJSON(data.agent_1.brain_1); // cross your fingers...
         w.agents[1].type = data.agent_1.type_1;
-        agent1.epsilon = 0.05;
+        agent1.epsilon = 0.20;
+
+        $("#eps_slider").slider('value', agent0.epsilon);
+        $("#eps").html(agent0.epsilon.toFixed(2));
 
         // kill learning rate to not learn
         agent0.alpha = 0.000;
         agent1.alpha = 0.000;
-
-        //adjust sliders
-        $("#eps_slider").slider('value', agent0.epsilon);
-        $("#eps").html(agent0.epsilon.toFixed(2));
-        $("#alpha_slider").slider('value', agent0.alpha.toFixed(4));
-        $("#alpha").html(agent0.alpha.toFixed(4));
+        $("#alpha_slider").slider('value', agent0.alpha);
+        $("#alpha").html(agent0.alpha.toFixed(2));
       });
     }
 
@@ -344,6 +343,7 @@
         step: 0.01,
         slide: function(event, ui) {
           w.agents[0].brain.epsilon = ui.value;
+          w.agents[1].brain.epsilon = ui.value;
           $("#eps").html(ui.value.toFixed(2));
         }
       });
@@ -380,7 +380,8 @@
       $("#alpha_slider").slider('value', w.agents[0].brain.alpha);
       
       initFlot();
-      gonormal();
+      loadAgents();
+      gofast();
 
       // render markdownclass="active"
       $(".md").each(function(){
@@ -439,7 +440,7 @@
     <h2>Summary</h2>
 
     <div id="coursedesc">
-    This is a project I designed in order to study how DeepQ networks learn to interact with other agents. JavaScript library and much of the world's physics taken from work by Andrej Karpathy. 
+    This is a project I designed in order to study how DeepQ networks learn to interact with other agents. JavaScript library and much of the world's physics taken from a <a href="https://cs.stanford.edu/people/karpathy/reinforcejs/">project</a> by Andrej Karpathy. 
     </div>
   </div>
 </div>
@@ -491,7 +492,7 @@
     spec.num_hidden_units = 100 // number of neurons in hidden layer
   </textarea>
 
-  <textarea id="mysterybox" style="width:70%;">agend json goes here</textarea>
+  <textarea id="mysterybox" style="width:70%;">agent json data</textarea>
 
   <div id="flotreward" style="width:100%; height:400px;"></div>
 </div>
@@ -503,7 +504,7 @@
         The items in this world begin as 'flipme' items. The agents come in two types: apple-loving and poison-loving. Once an agent touches one of these items, the item becomes the opposite of what the agent likes. My hope is that two different agents will learn an optimal strategy of 'hanging out' together so that they can flip items for each other's mutual benefit. Yay cooperation!
     </p>
     <p>
-        <b>Note</b>. To test whether or not cooperation is happening, click 'Load Pretrained Agent' (or train your own), reduce the epsilon and alpha parameters to 0, and reduce the number of items to 0 or only a small number (such as 10 or 20). 
+        <b>Note</b>. To test whether or not cooperation is happening, click 'Load Pretrained Agent' (or train your own), reduce the epsilon and alpha parameters to 0, and reduce the number of items to 0 or only a small number (such as 10 or 20). You will see the agents interact with one another, but their strategy will perhaps surprise you.
     </p>
 </div>
 
