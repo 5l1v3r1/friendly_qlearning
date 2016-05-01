@@ -101,13 +101,14 @@ var World = function() {
   */
   
   // set up food and poison
-  this.item_speed = 1;
-  this.nitems = 250;
+  this.item_speed = .2;
+  this.nitems = 300;
+  this.flip_expiration = 100;
   this.items = [];
   for(var k=0;k<this.nitems;k++) {
     var x = randf(20, this.W-10);
     var y = randf(20, this.H-10);
-    var t = randi(3, 5); // apples or poison (3 and 4)
+    var t = 5; //flipme type      //randi(3, 5); // apples or poison (3 and 4)
     var it = new Item(x, y, t);
     it.v.scale(this.item_speed);
     this.items.push(it);
@@ -276,17 +277,22 @@ World.prototype = {
           //var rescheck = this.stuff_collide_(a.p, it.p, true, false);
           var rescheck = false;
           if(!rescheck) { 
+            it.cleanup_ = true;
+            update_items = true;
             // ding! nom nom nom
             if(it.type === 3) {
               if (a.type===1) {a.digestion_signal += 1.0; a.apples++;} // mmm delicious apple (if type is 1)
-              else if (a.type===2) {a.digestion_signal += -4.0; a.apples++;} // sorry you can't eat apples
+              else if (a.type===2) {it.cleanup_=false;} // sorry you can't eat apples //a.digestion_signal += -.1; a.apples++;
             }
             if(it.type === 4) {
-              if (a.type===1) {a.digestion_signal += -4.0; a.poison++;} // ewww poison (if type is 1)
-              else if (a.type===2) {a.digestion_signal += 1.0; a.poison++;} // nice, you're safe
+              if (a.type===1) { it.cleanup_ = false;} // ewww poison (if type is 1) //a.digestion_signal += -.1; a.poison++;
+              else if (a.type===2) {a.digestion_signal += 1.0; a.poison++;} // nice, you like poison
             }
-            it.cleanup_ = true;
-            update_items = true;
+            if(it.type === 5) {
+              if (a.type===1) {it.type=4;} // you like apples but you made poison...
+              else if (a.type===2) {it.type=3;} // you like poison but you made apples...
+              it.cleanup_ = false;
+            }
             break; // break out of loop, item was consumed
           }
         }
@@ -317,6 +323,10 @@ World.prototype = {
         it.cleanup_ = true; // replace this one, has been around too long
         update_items = true;
       }
+      if(it.type != 5 && it.age > this.flip_expiration && this.clock % 20 === 0 && randf(0,1)<0.25) {
+        it.cleanup_ = true; // replace this one, has been around too long
+        update_items = true;
+      }
       
     }
     if(update_items) {
@@ -332,7 +342,7 @@ World.prototype = {
       for(var k=0;k<items_to_replace;k++) {
         var x = randf(20, this.W-20);
         var y = randf(20, this.H-20);
-        var t = randi(3, 5); // apples or poison (3 and 4)
+        var t = 5; //flipme type    //randi(3, 5); // apples or poison (3 and 4)
         var it = new Item(x, y, t);
         it.v.scale(this.item_speed);
         this.items.push(it);
@@ -413,7 +423,7 @@ Agent.prototype = {
       input_array[i*5+3] = e.vx; // velocity information of the sensed target
       input_array[i*5+4] = e.vy;
       if(e.sensed_type !== -1) {
-        // sensed_type is 0 for wall, 1 for apple lover, and 2 for poison lover, 3 for apples, and 4 for poison.
+        // sensed_type is 0 for wall, 1 for apple lover, and 2 for poison lover, 3 for apples, 4 for poison, 5 for flipme
         // lets do a 1-of-k encoding into the input array
         input_array[i*5 + e.sensed_type] = e.sensed_proximity/e.max_range; // normalize to [0,1]
       }
@@ -428,16 +438,16 @@ Agent.prototype = {
     //this.action = action;
   },
   backward: function() {
-    var reward = this.digestion_signal;
+    var reward = this.digestion_signal*10;
 
-    var proximity_reward = -.3;
+    var proximity_reward = 0;
     var num_eyes = this.eyes.length;
     for(var i=0;i<num_eyes;i++) {
       var e = this.eyes[i];
       // agents dont like to see walls, especially up close
-      proximity_reward += e.sensed_type === 0 ? e.sensed_proximity/e.max_range : 1.0;
+      proximity_reward += e.sensed_type === 0 ? e.sensed_proximity/e.max_range : 1;
     }
-    proximity_reward = proximity_reward/num_eyes;
+    proximity_reward = proximity_reward/num_eyes - 1;
     reward += proximity_reward;
 
     var forward_reward = 0.0;
