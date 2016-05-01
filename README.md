@@ -1,7 +1,7 @@
-# Friendly DeepQ
-[Website](https://greydanus.github.io/friendly_deepq/index.html)
+# Friendly qLearning
+[Website](https://greydanus.github.io/friendly_qlearning/index.html)
 
-This is a project I designed in order to study how DeepQ networks learn to interact with other agents. The reinforcement learning JavaScript library and much of the world's physics taken from work by Andrej Karpathy.
+This is a project I designed in order to study how qlearning networks learn to interact with each other. The reinforcement learning JavaScript library and much of the world's physics taken from work by Andrej Karpathy.
 
 ## Details
 The items in this world begin as 'flipme' items. The agents come in two types: apple-loving and poison-loving. Once an agent touches one of these items, the item becomes the opposite of what the agent likes. My hope is that two different agents will learn an optimal strategy of 'hanging out' together so that they can flip items for each other's mutual benefit. Yay cooperation!
