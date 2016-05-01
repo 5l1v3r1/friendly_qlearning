@@ -298,11 +298,15 @@
         w.agents[1].type = data.agent_1.type_1;
         agent1.epsilon = 0.05;
 
-        $("#slider").slider('value', agent0.epsilon);
-        $("#eps").html(agent0.epsilon.toFixed(2));
         // kill learning rate to not learn
         agent0.alpha = 0.000;
         agent1.alpha = 0.000;
+
+        //update sliders
+        $("#eps_slider").slider('value', agent0.epsilon);
+        $("#eps").html(agent0.epsilon.toFixed(2));
+        $("#alpha_slider").slider('value', agent0.alpha);
+        $("#alpha").html(agent0.alpha.toFixed(4));
       });
     }
 
@@ -427,7 +431,7 @@
     
 
 <div id="header">
-  <h1><b>FlipMe</b>: Exploring social behavior with DeepQ agents</h1>
+  <h1><b>Social DeepQ</b>: Exploring social behavior with DeepQ agents</h1>
   <div style="clear:both;"></div>
 </div>
 
