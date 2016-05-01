@@ -302,10 +302,10 @@
         agent0.alpha = 0.000;
         agent1.alpha = 0.000;
 
-        //update sliders
+        //adjust sliders
         $("#eps_slider").slider('value', agent0.epsilon);
         $("#eps").html(agent0.epsilon.toFixed(2));
-        $("#alpha_slider").slider('value', agent0.alpha);
+        $("#alpha_slider").slider('value', agent0.alpha.toFixed(4));
         $("#alpha").html(agent0.alpha.toFixed(4));
       });
     }
@@ -343,12 +343,11 @@
         value: w.agents[0].brain.epsilon,
         step: 0.01,
         slide: function(event, ui) {
-          w.agents[0].brain.epsilon = ui.value.toFixed(2);
-          w.agents[1].brain.epsilon = ui.value.toFixed(2);
+          w.agents[0].brain.epsilon = ui.value;
           $("#eps").html(ui.value.toFixed(2));
         }
       });
-      $("#eps").html(w.agents[0].brain.epsilon);
+      $("#eps").html(w.agents[0].brain.epsilon.toFixed(2));
       $("#eps_slider").slider('value', w.agents[0].brain.epsilon);
 
       // item density slider
@@ -431,7 +430,7 @@
     
 
 <div id="header">
-  <h1><b>Social DeepQ</b>: Exploring social behavior with DeepQ agents</h1>
+  <h1><b>Friendly DeepQ</b>: Exploring social behavior with DeepQ agents</h1>
   <div style="clear:both;"></div>
 </div>
 
@@ -440,7 +439,7 @@
     <h2>Summary</h2>
 
     <div id="coursedesc">
-    This is a project I designed in order to study how DeepQ networks learn to interact with other agents. JavaScript reinforcement learning library and much of the world's physics taken from a <a href="https://cs.stanford.edu/people/karpathy/reinforcejs/">project</a> by Andrej Karpathy. 
+    This is a project I designed in order to study how DeepQ networks learn to interact with other agents. JavaScript library and much of the world's physics taken from work by Andrej Karpathy. 
     </div>
   </div>
 </div>
@@ -460,7 +459,7 @@
   <button class="btn btn-primary" onclick="saveAgent()" style="width:200px;height:30px;margin-bottom:5px;margin-right:20px;">Save Agents</button>
   <br>
   <br>
-  Exploration epsilon: <span id="eps">0.20</span> <div style="width:70%;margin-left:auto;margin-right:auto" id="eps_slider"></div>
+  Exploration epsilon: <span id="eps">0.15</span> <div style="width:70%;margin-left:auto;margin-right:auto" id="eps_slider"></div>
   Item density: <span id="density">300</span> <div style="width:70%;margin-left:auto;margin-right:auto" id="density_slider"></div>
   Learning rate alpha: <span id="alpha">0.005</span> <div style="width:70%;margin-left:auto;margin-right:auto" id="alpha_slider"></div>
   <br>
@@ -492,7 +491,7 @@
     spec.num_hidden_units = 100 // number of neurons in hidden layer
   </textarea>
 
-  <textarea id="mysterybox" style="width:70%;">mystery text box</textarea>
+  <textarea id="mysterybox" style="width:70%;">agend json goes here</textarea>
 
   <div id="flotreward" style="width:100%; height:400px;"></div>
 </div>
@@ -504,7 +503,7 @@
         The items in this world begin as 'flipme' items. The agents come in two types: apple-loving and poison-loving. Once an agent touches one of these items, the item becomes the opposite of what the agent likes. My hope is that two different agents will learn an optimal strategy of 'hanging out' together so that they can flip items for each other's mutual benefit. Yay cooperation!
     </p>
     <p>
-        <b>Note</b>. To test whether or not cooperation is happening, click 'Load Pretrained Agent' (or train your own), reduce the epsilon and alpha parameters to 0, and reduce the number of items to 0 or only a small number (such as 10 or 20). You should see a clear cooperative strategy (though exactly how they cooperate is surprising).
+        <b>Note</b>. To test whether or not cooperation is happening, click 'Load Pretrained Agent' (or train your own), reduce the epsilon and alpha parameters to 0, and reduce the number of items to 0 or only a small number (such as 10 or 20). 
     </p>
 </div>
 
